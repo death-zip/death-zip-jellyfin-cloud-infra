@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      # --- VARIABLES OFUSCADAS (cámbialas por las tuyas) ---
+      - JELLYFIN_PUBLIC_HTTPS_PORT=${PUBLIC_HTTPS_PORT:-8920}
+      - TZ=${TIMEZONE:-America/Mexico_City}
+    volumes:
+      - ./config:/config      # Donde se guarda la base de datos y ajustes
+      - ./cache:/cache        # Caché para mejorar rendimiento
+      - ./media:/media        # Ruta a tus películas/series (¡ajústala!)
+    ports:
+      - "8096:8096"           # HTTP (interno)
+      # - "8920:8920"         # HTTPS (solo si tienes SSL propio, lo dejamos comentado)
+    networks:
+      - web_network
+
+  # OPCIÓN EXTRA: Si quieres que nginx corra dentro del docker también
+  # (si lo tienes instalado en el host, ignora este servicio)
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-jellyfin-proxy
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - jellyfin
+    networks:
+      - web_network
+
+networks:
+  web_network:
+    driver: bridge

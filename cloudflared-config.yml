@@ -1,0 +1,10 @@
+# cloudflared-config.yml
+# Configuración del túnel de Cloudflare para Jellyfin
+
+tunnel: d6e8ca23-4fce-42fe-aa3f-56080fb49c76
+credentials-file: /root/.cloudflared/d6e8ca23-4fce-42fe-aa3f-56080fb49c76.json
+
+ingress:
+  - hostname: media.jarr.cc.cd
+    service: http://localhost:80
+  - service: http_status:404
